@@ -1,112 +1,224 @@
 package com.example.calculatrice;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView premierChiffreTextView;
-    private TextView deuxiemeChiffreTextView;
+    private CalculatorLogic calculatorLogic;
     private TextView outputTextView;
-    private StringBuilder premierChiffreBuilder;
-    private StringBuilder deuxiemeChiffreBuilder;
-    private boolean isFirstField;
+    private TextView premierChiffreTextView;
+    private double currentNumber =0;
+    private double muldiv = 0;
+    private char pastOperator ;
+    private StringBuilder temp = new StringBuilder();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        premierChiffreTextView = findViewById(R.id.PremierChiffre);
-        deuxiemeChiffreTextView = findViewById(R.id.DeuxiemeChiffre);
+        calculatorLogic = new CalculatorLogic();
         outputTextView = findViewById(R.id.Output);
-
-        premierChiffreBuilder = new StringBuilder();
-        deuxiemeChiffreBuilder = new StringBuilder();
-        isFirstField = true;
+        premierChiffreTextView = findViewById(R.id.PremierChiffre);
     }
 
     public void Send0(View view) {
-        appendNumber("0");
+        calculatorLogic.appendNumber("0");
+        updatePremierChiffreTextView();
     }
 
     public void Send1(View view) {
-        appendNumber("1");
+        calculatorLogic.appendNumber("1");
+        updatePremierChiffreTextView();
     }
 
     public void Send2(View view) {
-        appendNumber("2");
+        calculatorLogic.appendNumber("2");
+        updatePremierChiffreTextView();
     }
 
     public void Send3(View view) {
-        appendNumber("3");
+        calculatorLogic.appendNumber("3");
+        updatePremierChiffreTextView();
     }
 
     public void Send4(View view) {
-        appendNumber("4");
+        calculatorLogic.appendNumber("4");
+        updatePremierChiffreTextView();
     }
 
     public void Send5(View view) {
-        appendNumber("5");
+        calculatorLogic.appendNumber("5");
+        updatePremierChiffreTextView();
     }
 
     public void Send6(View view) {
-        appendNumber("6");
+        calculatorLogic.appendNumber("6");
+        updatePremierChiffreTextView();
     }
 
     public void Send7(View view) {
-        appendNumber("7");
+        calculatorLogic.appendNumber("7");
+        updatePremierChiffreTextView();
     }
 
     public void Send8(View view) {
-        appendNumber("8");
+        calculatorLogic.appendNumber("8");
+        updatePremierChiffreTextView();
     }
 
     public void Send9(View view) {
-        appendNumber("9");
+        calculatorLogic.appendNumber("9");
+        updatePremierChiffreTextView();
     }
 
     public void SendPoint(View view) {
-        appendNumber(".");
+        calculatorLogic.appendNumber(".");
+        updatePremierChiffreTextView();
     }
 
-    public void SendVirgule(View view) {
-        appendNumber(",");
+    public void AddSubstract(View view) {
+        if (temp.length() > 0) {
+            muldiv = currentNumber;
+            currentNumber = calculatorLogic.calculate(outputTextView, 0);
+            calculatorLogic.premierChiffreBuilder.replace(0, calculatorLogic.premierChiffreBuilder.length(), temp.toString());
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            temp.setLength(0);
+            temp.replace(0, temp.length(), "");
+            if (muldiv!=0){
+                currentNumber = currentNumber + muldiv;
+                muldiv = 0;
+            }
+            calculatorLogic.operator = pastOperator;
+            currentNumber = calculatorLogic.calculate(outputTextView, currentNumber);
+            calculatorLogic.operator = '+';
+            updatePremierChiffreTextView();
+        }
+        if (calculatorLogic.deuxiemeChiffreBuilder.length() > 0) {
+            currentNumber = calculatorLogic.calculate(outputTextView, currentNumber);
+            calculatorLogic.operator = '+';
+            updatePremierChiffreTextView();
+            return;
+        }
+        if (calculatorLogic.operator == '+') {
+            calculatorLogic.setOperator('-');
+        } else {
+        calculatorLogic.setOperator('+');
+        }
+        updatePremierChiffreTextView();
+
     }
 
-    public void Next(View view) {
-        isFirstField = false;
+    public void Divide(View view) {
+        if (calculatorLogic.deuxiemeChiffreBuilder.length() > 0) {
+            pastOperator = calculatorLogic.operator;
+            calculatorLogic.setOperator('/');
+            temp.replace(0, temp.length(), calculatorLogic.premierChiffreBuilder.toString());
+            calculatorLogic.premierChiffreBuilder.replace(0, calculatorLogic.premierChiffreBuilder.length(), calculatorLogic.deuxiemeChiffreBuilder.toString());
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            updatePremierChiffreTextView();
+            return;
+        } else if (temp.length()>0) {
+            if (currentNumber !=0){
+                muldiv = currentNumber;
+            }
+            currentNumber = calculatorLogic.calculate(outputTextView, 0);
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            calculatorLogic.setOperator('/');
+            updatePremierChiffreTextView();
+            return;
+        }
+        calculatorLogic.setOperator('/');
+        updatePremierChiffreTextView();
+
+    }
+
+    public void Multiply(View view) {
+        if (calculatorLogic.deuxiemeChiffreBuilder.length() > 0) {
+            pastOperator = calculatorLogic.operator;
+            calculatorLogic.setOperator('*');
+            temp.replace(0, temp.length(), calculatorLogic.premierChiffreBuilder.toString());
+            calculatorLogic.premierChiffreBuilder.replace(0, calculatorLogic.premierChiffreBuilder.length(), calculatorLogic.deuxiemeChiffreBuilder.toString());
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            updatePremierChiffreTextView();
+            return;
+        } else if (temp.length()>0) {
+            if (currentNumber !=0){
+                muldiv = currentNumber;
+            }
+            currentNumber = calculatorLogic.calculate(outputTextView, 0);
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            calculatorLogic.setOperator('*');
+            updatePremierChiffreTextView();
+            return;
+        }
+        calculatorLogic.setOperator('*');
+        updatePremierChiffreTextView();
+
     }
 
     public void Clear(View view) {
-        premierChiffreBuilder.delete(0,premierChiffreBuilder.length());
-        deuxiemeChiffreBuilder.delete(0,deuxiemeChiffreBuilder.length());
-        premierChiffreTextView.setText("");
-        deuxiemeChiffreTextView.setText("");
+        calculatorLogic.clear();
+        updatePremierChiffreTextView();
         outputTextView.setText("");
-        isFirstField = true;
+        currentNumber = 0;
+        pastOperator = ' ';
+        temp.setLength(0);
+        temp.replace(0, temp.length(), "");
+        muldiv = 0;
+        premierChiffreTextView.setText("");
     }
 
-    public void Calculer(View view) {
-        try {
-            double premierChiffre = Double.parseDouble(premierChiffreBuilder.toString());
-            double deuxiemeChiffre = Double.parseDouble(deuxiemeChiffreBuilder.toString());
-            double result = premierChiffre + deuxiemeChiffre;
-            outputTextView.setText(String.valueOf(result));
-        } catch (NumberFormatException e) {
-            outputTextView.setText("Invalid input");
+    public void Egal(View view) {
+        if (temp.length()>0) {
+            muldiv = currentNumber;
+            currentNumber = calculatorLogic.calculate(outputTextView, 0);
+            calculatorLogic.premierChiffreBuilder.replace(0, calculatorLogic.premierChiffreBuilder.length(), temp.toString());
+            calculatorLogic.deuxiemeChiffreBuilder.setLength(0);
+            calculatorLogic.deuxiemeChiffreBuilder.replace(0, calculatorLogic.deuxiemeChiffreBuilder.length(), "");
+            temp.setLength(0);
+            temp.replace(0, temp.length(), "");
+            if (muldiv!=0){
+                currentNumber = currentNumber + muldiv;
+                muldiv = 0;
+            }
+            calculatorLogic.operator = pastOperator;
+            currentNumber = calculatorLogic.calculate(outputTextView, currentNumber);
+            calculatorLogic.operator = ' ';
+            updatePremierChiffreTextView();
+            return;
         }
+
+        currentNumber = calculatorLogic.calculate(outputTextView, currentNumber);
+        calculatorLogic.operator = ' ';
+        updatePremierChiffreTextView();
     }
 
-    private void appendNumber(String number) {
-        if (isFirstField) {
-            premierChiffreBuilder.append(number);
-            premierChiffreTextView.setText(premierChiffreBuilder.toString());
+    private void updatePremierChiffreTextView() {
+        String garbage;
+        if (temp.length()>0){
+            garbage = temp.toString();
         } else {
-            deuxiemeChiffreBuilder.append(number);
-            deuxiemeChiffreTextView.setText(deuxiemeChiffreBuilder.toString());
+            garbage = "";
         }
+        if (pastOperator != 0){
+            garbage = garbage + pastOperator;
+        }
+        if (calculatorLogic.premierChiffreBuilder.length() != 0) {
+            garbage = garbage + calculatorLogic.premierChiffreBuilder.toString() + calculatorLogic.operator + calculatorLogic.deuxiemeChiffreBuilder.toString() ;
+        } else {
+            garbage = garbage + Double.toString(currentNumber) + calculatorLogic.operator + calculatorLogic.deuxiemeChiffreBuilder.toString();
+        }
+        premierChiffreTextView.setText(garbage);
+
     }
-
-
 }
